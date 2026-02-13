@@ -1,3 +1,4 @@
+import User from '#models/user'
 import { loginValidator } from '#validators/auth'
 import type { HttpContext } from '@adonisjs/core/http'
 
@@ -6,14 +7,14 @@ export default class LoginController {
     return view.render('pages/auth/login')
   }
 
-  async store({ request, response }: HttpContext) {
+  async store({ request, response, auth }: HttpContext) {
     // 1. Grab our validated data off the request
-    const data = await request.validateUsing(loginValidator)
-    console.log({ data })
+    const { email, password, isRememberMe } = await request.validateUsing(loginValidator)
 
-    // 2. Login our user
+    const user = await User.verifyCredentials(email, password)
 
-    // 3. Return our user back to the home page
+    await auth.use('web').login(user, isRememberMe)
+
     return response.redirect().toRoute('home')
   }
 }
