@@ -1,8 +1,10 @@
 import Movie from '#models/movie'
 import User from '#models/user'
+import Cineast from '#models/cineast'
+import MovieStatus from '#models/movie_status'
 import { release } from 'node:os'
 import { Infer } from '@vinejs/vine/types'
-import { movieFilterValidator } from '#validators/movie'
+import { movieFilterValidator } from '#validators/movie_filter'
 
 type MovieSortOption = {
   id: string
@@ -40,5 +42,11 @@ export default class MovieService {
       .preload('status')
       .orderBy(sort.field, sort.dir)
 
+  }
+
+   static async getFormData() {
+    const statuses = await MovieStatus.query().orderBy('name')
+    const cineasts = await Cineast.query().orderBy('lastName')
+    return { statuses, cineasts }
   }
 }

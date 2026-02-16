@@ -1,31 +1,24 @@
 import vine from '@vinejs/vine'
-import MovieService from '#services/movie_service'
 
+import { DateTime } from 'luxon'
 
-
-const sharedMovieFilterSchema = vine.object({
-  search: vine.string().optional(),
-  status: vine
-    .number()
-    .exists(async (db, value) => {
-      if (!value) return true
-      const exists = await db.from('movie_statuses').select('id').where('id', value).first()
-      return !!exists
-    })
-    .optional(),
-  sort: vine
-    .string()
-    .exists(async (_db, value) => {
-      return MovieService.sortOptions.some((option) => option.id === value)
-    })
-    .optional(),
-})
-
-export const movieFilterValidator = vine.compile(sharedMovieFilterSchema)
-
-export const watchlistFilterValidator = vine.compile(
+export const movieValidator = vine.compile(
   vine.object({
-    ...sharedMovieFilterSchema.getProperties(),
-    watched: vine.enum(['all', 'watched', 'unwatched']).optional()
+        title: vine.string().maxLength(100),
+      summary: vine
+      .string()
+      .maxLength(255)
+      .nullable()
+      .transform((value) => (value ? value : '')),
+    abstract: vine.string(),
+    writerId: vine.number().isExists({ table: 'cineasts', column: 'id' }),
+    directorId: vine.number().isExists({ table: 'cineasts', column: 'id' }),
+    statusId: vine.number().isExists({ table: 'movie_statuses', column: 'id' }),
+    releasedAt: vine
+      .date()
+      .nullable()
+      .transform((value) => {
+        return DateTime.fromJSDate(value)
+      }),
   })
 )

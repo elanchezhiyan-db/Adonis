@@ -1,0 +1,17 @@
+
+<div class="flex text-wrap text-l things-center">
+
+<form method="post" action="/demo">
+    {{ csrfField() }}
+    <p>Name :</p>
+    <input name='name'
+    placeholder="Enter your name"
+    required>
+    <p>Role :</p>
+    <input name="role" placeholder="Enter your role" required>
+
+    <button type="submit" >
+        Enter
+    </button>
+</form>
+</div>
